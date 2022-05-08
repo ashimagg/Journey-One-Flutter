@@ -35,6 +35,8 @@ dependencies:
   amplify_analytics_pinpoint: ^0.4.0
   amplify_authenticator: ^0.1.0
 
+  flutter_riverpod: ^1.0.0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
