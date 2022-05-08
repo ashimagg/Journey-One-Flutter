@@ -6,6 +6,7 @@ import 'package:my_app/page/common/error.dart';
 import 'package:my_app/page/home/bottom_bar.dart';
 import 'package:my_app/page/home/all_entries.dart';
 import 'package:my_app/providers.dart';
+import 'package:my_app/aws-auth.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -27,14 +28,24 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final currentUser = ref.watch(authUserProvider);
     return Scaffold(
+      drawer: Drawer(
+          child: ListView(
+        children: [
+          ListTile(
+              title: const Text(
+                'Logout',
+                style: TextStyle(fontSize: 16),
+              ),
+              leading: const Icon(Icons.logout),
+              onTap: () async {
+                final authAWSRepo = ref.watch(authAWSRepositoryProvider);
+                await authAWSRepo.logOut();
+              })
+        ],
+      )),
       appBar: AppBar(
           title: Text(currentUser.when(
               data: (data) => data, error: (e, st) => '', loading: () => '')),
-          leading: IconButton(
-            icon: const Icon(Icons.list),
-            onPressed: _pushSaved,
-            tooltip: 'Saved Suggestions',
-          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.settings),
