@@ -12,8 +12,34 @@ class AWSAuthRepository {
   /// the authentication state changes.
   Future<String> get user async {
     try {
-      final awsUser = await Amplify.Auth.getCurrentUser();
+      final AuthUser awsUser = await Amplify.Auth.getCurrentUser();
       return awsUser.userId;
+    } on Exception {
+      rethrow;
+    }
+  }
+
+  Future<String> get email async {
+    try {
+      List<AuthUserAttribute> attributes =
+          (await Amplify.Auth.fetchUserAttributes()).toList();
+      for (AuthUserAttribute attribute in attributes) {
+        if (attribute.userAttributeKey.key == 'email') {
+          return attribute.value;
+        }
+      }
+      throw Exception('No Attribute with Email Found');
+    } on Exception {
+      rethrow;
+    }
+  }
+
+  Future<String> get token async {
+    try {
+      final CognitoAuthSession session = await Amplify.Auth.fetchAuthSession(
+              options: CognitoSessionOptions(getAWSCredentials: true))
+          as CognitoAuthSession;
+      return session.userPoolTokens!.idToken;
     } on Exception {
       rethrow;
     }

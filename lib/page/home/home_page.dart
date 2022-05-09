@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_app/activity/get_entries_activity.dart';
+import 'package:my_app/providers/database.dart';
+import 'package:my_app/providers/get_entries_activity.dart';
 import 'package:my_app/model/entry.dart';
 import 'package:my_app/page/common/error.dart';
 import 'package:my_app/page/home/bottom_bar.dart';
 import 'package:my_app/page/home/all_entries.dart';
-import 'package:my_app/providers.dart';
-import 'package:my_app/aws-auth.dart';
+import 'package:my_app/providers/providers.dart';
+import 'package:my_app/providers/aws-auth.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -21,12 +22,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    futureEntries = GetEntriesActivity.enact('123489839', 10);
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = ref.watch(authUserProvider);
+    final AsyncValue<String> currentEmail = ref.watch(emailProvider);
     return Scaffold(
       drawer: Drawer(
           child: ListView(
@@ -44,7 +44,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       )),
       appBar: AppBar(
-          title: Text(currentUser.when(
+          title: Text(currentEmail.when(
               data: (data) => data, error: (e, st) => '', loading: () => '')),
           actions: [
             IconButton(
@@ -59,18 +59,12 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _body() {
-    return FutureBuilder<List<Entry>>(
-        future: futureEntries,
-        builder: (BuildContext context, AsyncSnapshot<List<Entry>> snapshot) {
-          if (snapshot.hasData) {
-            return AllEntriesView(entries: snapshot.data);
-          } else if (snapshot.hasError) {
-            return const ErrorView();
-          }
-          // By default, show a loading spinner.
-          return const Align(
-              alignment: Alignment.center, child: CircularProgressIndicator());
-        });
+    final database = ref.watch(entriesProvider('123489839'));
+    return database.when(
+        data: (data) => AllEntriesView(entries: data),
+        error: (e, st) => const ErrorView(),
+        loading: () => const Align(
+            alignment: Alignment.center, child: CircularProgressIndicator()));
   }
 
   void _pushSaved() {}
