@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 class HttpLoader {
-  Future<String> getPositions(String userId, String token) async {
+  Future<String> getEntries(String userId, String token) async {
     String serverUrl = 'pqold6av9a.execute-api.us-east-1.amazonaws.com';
     String path = '/prod/entries';
     Map<String, dynamic> queryParams = {'user_id': userId};

@@ -34,7 +34,7 @@ class AWSAuthRepository {
     }
   }
 
-  Future<String> get token async {
+  Future<String> get idToken async {
     try {
       final CognitoAuthSession session = await Amplify.Auth.fetchAuthSession(
               options: CognitoSessionOptions(getAWSCredentials: true))

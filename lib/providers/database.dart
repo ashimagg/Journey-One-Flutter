@@ -4,12 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/model/entry.dart';
 import 'package:my_app/utils/http_loader.dart';
 
-final dataBaseProvider = Provider<DataBase>((ref) => DataBase());
+final databaseProvider = Provider<DataBase>((ref) => DataBase());
 
 class DataBase {
-  Future<List<Entry>> getEntries(String userId, String token) async {
+  DataBase() : super();
+
+  Future<List<Entry>> getEntries(GetEntriesRequest getEntriesRequest) async {
     final httpLoader = HttpLoader();
-    String jsonString = await httpLoader.getPositions(userId, token);
+
+    String jsonString = await httpLoader.getEntries(
+        getEntriesRequest.userId, getEntriesRequest.idToken);
 
     try {
       List<Entry> entries = [];
@@ -22,4 +26,11 @@ class DataBase {
       throw Exception("Could not format API Response JSON");
     }
   }
+}
+
+class GetEntriesRequest {
+  final String userId;
+  final String idToken;
+
+  GetEntriesRequest(this.userId, this.idToken);
 }

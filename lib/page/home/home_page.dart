@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_app/providers/database.dart';
-import 'package:my_app/providers/get_entries_activity.dart';
 import 'package:my_app/model/entry.dart';
 import 'package:my_app/page/common/error.dart';
 import 'package:my_app/page/home/bottom_bar.dart';
@@ -17,7 +15,8 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  late Future<List<Entry>> futureEntries;
+  static const double listViewMargin = 10;
+  static const listViewBackgroundColor = Colors.black87;
 
   @override
   void initState() {
@@ -27,7 +26,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<String> currentEmail = ref.watch(emailProvider);
+
     return Scaffold(
+      // backgroundColor: listViewBackgroundColor,
       drawer: Drawer(
           child: ListView(
         children: [
@@ -38,7 +39,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               leading: const Icon(Icons.logout),
               onTap: () async {
-                final authAWSRepo = ref.watch(authAWSRepositoryProvider);
+                final authAWSRepo = ref.read(authAWSRepositoryProvider);
                 await authAWSRepo.logOut();
               })
         ],
@@ -59,9 +60,12 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _body() {
-    final database = ref.watch(entriesProvider('123489839'));
+    final AsyncValue<List<Entry>> database = ref.watch(entriesProvider);
     return database.when(
-        data: (data) => AllEntriesView(entries: data),
+        data: (data) => Container(
+            decoration: const BoxDecoration(color: listViewBackgroundColor),
+            padding: const EdgeInsets.all(listViewMargin),
+            child: AllEntriesView(entries: data)),
         error: (e, st) => const ErrorView(),
         loading: () => const Align(
             alignment: Alignment.center, child: CircularProgressIndicator()));
